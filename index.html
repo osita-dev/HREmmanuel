@@ -1,0 +1,1088 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HRwithEM — Header (Tailwind + Vanilla JS)</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Design tokens from user */
+        :root {
+            --deep-navy: #0B2545;
+            /* primary background / hero */
+            --gold-accent: #C99A45;
+            /* primary CTA */
+            --off-white: #F7F6F4;
+            /* body background / cream */
+            --muted-gray: #637083;
+            /* text secondary */
+        }
+
+        /* Tailwind-friendly helpers */
+        .container-narrow {
+            max-width: 1100px;
+        }
+
+        /* Typography */
+        .font-heading {
+            font-family: "Playfair Display", serif;
+        }
+
+        .font-body {
+            font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+
+        /* Header scrolled state */
+        header.scrolled {
+            background-color: rgba(11, 37, 69, 0.95);
+            /* fallback */
+            backdrop-filter: blur(6px);
+            box-shadow: 0 8px 30px rgba(2, 6, 23, 0.45);
+        }
+
+        /* Use CSS color-mix if supported for subtle translucency */
+        header.scrolled {
+            background-color: color-mix(in srgb, var(--deep-navy) 92%, transparent);
+        }
+
+        /* Buttons */
+        .btn-gold {
+            background: linear-gradient(180deg, var(--gold-accent), color-mix(in srgb, var(--gold-accent) 80%, black 10%));
+            color: #07102a;
+            padding: 0.5rem 0.9rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+        }
+
+        .ghost-cream {
+            color: var(--off-white);
+            border: 1px solid color-mix(in srgb, var(--off-white) 30%, black 0%);
+            background: transparent;
+            padding: 0.45rem 0.9rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+        }
+
+        /* Mobile menu background */
+        .mobile-bg {
+            background-color: color-mix(in srgb, var(--deep-navy) 98%, transparent);
+        }
+
+        /* simple fade-in */
+        @keyframes fadeInY {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInY 220ms ease-out;
+        }
+
+        /* text helpers */
+        .text-cream {
+            color: var(--off-white);
+        }
+
+        .text-muted {
+            color: var(--muted-gray);
+        }
+
+        /* focus ring */
+        .focus-ring:focus {
+            outline: 3px solid rgba(201, 154, 69, 0.18);
+            outline-offset: 3px;
+        }
+
+        /* page background */
+        body {
+            background: var(--off-white);
+        }
+    </style>
+</head>
+
+<body class="font-body text-slate-900">
+
+    <!-- Header -->
+    <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div class="container-narrow mx-auto px-4 md:px-8">
+            <div class="flex items-center justify-between h-16 md:h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2">
+                    <span class="text-xl md:text-2xl font-heading font-bold text-cream">
+                        <span class="text-cream">HR</span><span class="text-cream">with</span><span class="text-gold"
+                            style="color:var(--gold-accent)">EM</span>
+                    </span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8" aria-label="Primary navigation">
+                    <a href="#about"
+                        class="text-cream text-sm font-medium hover:text-gold transition-colors duration-200">About</a>
+                    <a href="#achievements"
+                        class="text-cream text-sm font-medium hover:text-gold transition-colors duration-200">Achievements</a>
+                    <a href="#scholarship"
+                        class="text-cream text-sm font-medium hover:text-gold transition-colors duration-200">Scholarship</a>
+                    <a href="#services"
+                        class="text-cream text-sm font-medium hover:text-gold transition-colors duration-200">Services</a>
+                    <a href="#contact"
+                        class="text-cream text-sm font-medium hover:text-gold transition-colors duration-200">Contact</a>
+                </nav>
+
+                <!-- Desktop CTAs -->
+                <div class="hidden md:flex items-center gap-3">
+                    <button id="invite-btn" class="ghost-cream hover:bg-[rgba(247,246,244,0.05)] focus-ring"
+                        aria-label="Invite to Speak">Invite to Speak</button>
+                    <button id="book-btn" class="btn-gold focus-ring" aria-label="Book Coaching">Book Coaching</button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-toggle" class="md:hidden text-cream p-2 focus-ring" aria-label="Toggle menu"
+                    aria-expanded="false">
+                    <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="block">
+                        <path d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    <svg id="icon-x" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="hidden">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="md:hidden hidden mobile-bg pb-6 animate-fade-in">
+                <nav class="flex flex-col gap-4 mb-6 px-4 pt-2">
+                    <a href="#about" class="text-cream py-2 hover:text-gold transition-colors" data-nav>About</a>
+                    <a href="#achievements" class="text-cream py-2 hover:text-gold transition-colors"
+                        data-nav>Achievements</a>
+                    <a href="#scholarship" class="text-cream py-2 hover:text-gold transition-colors"
+                        data-nav>Scholarship</a>
+                    <a href="#services" class="text-cream py-2 hover:text-gold transition-colors" data-nav>Services</a>
+                    <a href="#contact" class="text-cream py-2 hover:text-gold transition-colors" data-nav>Contact</a>
+                </nav>
+                <div class="flex flex-col gap-3 px-4">
+                    <button id="invite-mob" class="w-full ghost-cream py-2 rounded-md focus-ring">Invite to
+                        Speak</button>
+                    <button id="book-mob" class="w-full btn-gold py-2 rounded-md focus-ring">Book Coaching</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main / Single long-scroll layout -->
+    <main class="pt-24">
+        <!-- Hero (uses deep navy) -->
+        <section class="relative min-h-screen flex items-center overflow-hidden bg-[#0B2545]">
+            <!-- overlay -->
+            <div class="absolute inset-0 opacity-80"
+                style="background: linear-gradient(135deg, rgba(11,37,69,0.95) 0%, rgba(11,37,69,0.85) 50%, rgba(11,37,69,0.7) 100%);">
+            </div>
+
+            <!-- gold glow decorations -->
+            <div class="absolute top-20 right-10 w-72 h-72 bg-[#C99A45]/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 left-10 w-96 h-96 bg-[#C99A45]/5 rounded-full blur-3xl"></div>
+
+            <div class="relative z-10 container mx-auto px-6 md:px-10 pt-24 pb-20">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+
+                    <!-- TEXT -->
+                    <div>
+                        <h1
+                            class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-[#F7F6F4] leading-tight">
+                            Empowering the next generation of
+                            <span class="text-[#C99A45]">leaders.</span>
+                        </h1>
+
+                        <p class="mt-6 text-lg md:text-xl font-body text-[#F7F6F4]/80 leading-relaxed">
+                            Emmanuel Michael — Leadership coach, HR thought leader, mentor.
+                            Helping professionals turn potential into impact.
+                        </p>
+
+                        <!-- CTAs -->
+                        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                            <a href="#contact"
+                                class="text-lg px-8 py-4 rounded-xl bg-[#C99A45] text-[#0B2545] font-semibold text-center hover:bg-[#b7883c] transition">
+                                Book Emmanuel for Coaching
+                            </a>
+
+                            <a href="#contact"
+                                class="text-lg px-8 py-4 rounded-xl border-2 border-[#F7F6F4]/40 text-[#F7F6F4] text-center hover:bg-white/10 transition">
+                                Invite Emmanuel to Speak
+                            </a>
+                        </div>
+
+                        <!-- Credibility Row -->
+                        <div class="mt-10 flex flex-wrap gap-6 text-[#F7F6F4]/70 text-sm font-medium">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-[#C99A45] rounded-full"></span>
+                                21+ Years Experience
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-[#C99A45] rounded-full"></span>
+                                SPHRi Certified
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-[#C99A45] rounded-full"></span>
+                                Chair, HRCI Council
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HEADSHOT AREA -->
+                    <div class="relative flex justify-center md:justify-end">
+                        <div class="relative">
+                            <div
+                                class="w-72 h-72 md:w-96 md:h-96 rounded-full bg-gradient-to-br from-[#C99A45]/25 to-transparent flex items-center justify-center overflow-hidden border-4 border-[#C99A45]/20">
+                                <div class="text-center p-6">
+                                    <div
+                                        class="w-24 h-24 mx-auto bg-[#C99A45]/20 rounded-full flex items-center justify-center mb-4">
+                                        <span class="text-4xl font-display font-bold text-[#F7F6F4]">EM</span>
+                                    </div>
+                                    <p class="text-[#F7F6F4]/60 text-sm">Professional Headshot</p>
+                                </div>
+                            </div>
+
+                            <!-- Outer ring -->
+                            <div class="absolute -inset-4 border-2 border-[#C99A45]/20 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll indicator -->
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2">
+                <div class="w-6 h-10 border-2 border-[#F7F6F4]/30 rounded-full flex items-start justify-center p-2">
+                    <div class="w-1 h-3 bg-[#C99A45] rounded-full"></div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- About -->
+        <section id="about" class="py-20 bg-[#F7F6F4] font-body">
+            <div class="container-narrow mx-auto px-6 md:px-10">
+                <!-- Quick Intro -->
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-[#0B2545] mb-6">
+                        Building Leaders Who Deliver Results
+                    </h2>
+                    <p class="mx-auto max-w-3xl text-lg leading-relaxed text-[#637083]">
+                        With 21+ years in HR leadership and a deep commitment to people development,
+                        Emmanuel builds leaders who deliver results and create impact. His passion lies
+                        in transforming potential into performance through coaching, mentorship, and
+                        strategic leadership development.
+                    </p>
+                </div>
+
+                <!-- Leadership Identity Card -->
+                <div class="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-[rgba(11,37,69,0.06)]">
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <!-- Left: Text -->
+                        <div>
+                            <h3 class="text-2xl font-display font-semibold text-[#0B2545] mb-4">Leadership Identity</h3>
+
+                            <p class="text-[#637083] leading-relaxed mb-6">
+                                Emmanuel's leadership style is characterized by strategic thinking,
+                                continuous learning, and an unwavering commitment to achieving results.
+                                His approach combines deep expertise in human resources with a genuine
+                                passion for developing people at every level.
+                            </p>
+
+                            <p class="text-[#637083] leading-relaxed">
+                                As a certified Senior Professional in Human Resources International (SPHRi)
+                                and Chair of the HRCI Council, he brings both global perspective and
+                                practical wisdom to every engagement.
+                            </p>
+                        </div>
+
+                        <!-- Right: Strength Chips -->
+                        <div class="flex flex-wrap gap-3 justify-center md:justify-start">
+                            <!-- chips — add / remove strengths as needed -->
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(11,37,69,0.06)] bg-[rgba(201,154,69,0.06)] text-[#0B2545] font-medium text-sm transform transition-all duration-300 hover:scale-105"
+                                style="animation: fadeUp 360ms ease forwards; animation-delay: 0ms;">
+                                Responsibility
+                            </div>
+
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(11,37,69,0.06)] bg-[rgba(201,154,69,0.06)] text-[#0B2545] font-medium text-sm transform transition-all duration-300 hover:scale-105"
+                                style="animation: fadeUp 360ms ease forwards; animation-delay: 100ms;">
+                                Strategic
+                            </div>
+
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(11,37,69,0.06)] bg-[rgba(201,154,69,0.06)] text-[#0B2545] font-medium text-sm transform transition-all duration-300 hover:scale-105"
+                                style="animation: fadeUp 360ms ease forwards; animation-delay: 200ms;">
+                                Learner
+                            </div>
+
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(11,37,69,0.06)] bg-[rgba(201,154,69,0.06)] text-[#0B2545] font-medium text-sm transform transition-all duration-300 hover:scale-105"
+                                style="animation: fadeUp 360ms ease forwards; animation-delay: 300ms;">
+                                Achiever
+                            </div>
+
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(11,37,69,0.06)] bg-[rgba(201,154,69,0.06)] text-[#0B2545] font-medium text-sm transform transition-all duration-300 hover:scale-105"
+                                style="animation: fadeUp 360ms ease forwards; animation-delay: 400ms;">
+                                Focus
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- tiny CSS for the fade-up animation (paste into global CSS or in a <style> block) -->
+            <style>
+                @keyframes fadeUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(8px);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            </style>
+        </section>
+
+
+        <!-- Achievements -->
+        <section id="achievements" class="py-20 bg-[#0B2545] font-body">
+            <div class="container-narrow mx-auto px-6 md:px-10">
+                <!-- Section header -->
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-[#F7F6F4] mb-4">
+                        A Journey of Impact
+                    </h2>
+                    <p class="text-[#F7F6F4]/70 max-w-2xl mx-auto">
+                        Two decades of leadership, recognition, and commitment to developing others.
+                    </p>
+                </div>
+
+                <!-- Timeline -->
+                <div class="relative">
+                    <!-- Timeline line (desktop) -->
+                    <div class="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-[#C99A45]/30 -translate-y-1/2">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                        <!-- Achievement card -->
+                        <div class="relative group">
+                            <div
+                                class="bg-[#F7F6F4]/5 backdrop-blur-sm p-6 rounded-xl border border-[#C99A45]/20 hover:border-[#C99A45]/50 transition-all duration-300 hover:-translate-y-2 text-center">
+                                <!-- Icon badge -->
+                                <div
+                                    class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#C99A45]/20 text-[#C99A45] mb-4">
+                                    🌐
+                                </div>
+                                <!-- Year -->
+                                <div class="text-2xl font-display font-bold text-[#C99A45] mb-2">
+                                    2018
+                                </div>
+                                <!-- Title -->
+                                <p class="text-[#F7F6F4]/80 text-sm leading-snug">
+                                    100 Most Influential Global HR Leaders
+                                </p>
+                            </div>
+                            <!-- Timeline dot -->
+                            <div
+                                class="hidden md:block absolute -bottom-8 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#C99A45] border-4 border-[#0B2545]">
+                            </div>
+                        </div>
+
+                        <div class="relative group">
+                            <div
+                                class="bg-[#F7F6F4]/5 backdrop-blur-sm p-6 rounded-xl border border-[#C99A45]/20 hover:border-[#C99A45]/50 transition-all duration-300 hover:-translate-y-2 text-center">
+                                <div
+                                    class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#C99A45]/20 text-[#C99A45] mb-4">
+                                    👥
+                                </div>
+                                <div class="text-2xl font-display font-bold text-[#C99A45] mb-2">2019</div>
+                                <p class="text-[#F7F6F4]/80 text-sm leading-snug">
+                                    HRCI Council Chair Appointment
+                                </p>
+                            </div>
+                            <div
+                                class="hidden md:block absolute -bottom-8 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#C99A45] border-4 border-[#0B2545]">
+                            </div>
+                        </div>
+
+                        <div class="relative group">
+                            <div
+                                class="bg-[#F7F6F4]/5 backdrop-blur-sm p-6 rounded-xl border border-[#C99A45]/20 hover:border-[#C99A45]/50 transition-all duration-300 hover:-translate-y-2 text-center">
+                                <div
+                                    class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#C99A45]/20 text-[#C99A45] mb-4">
+                                    🏆
+                                </div>
+                                <div class="text-2xl font-display font-bold text-[#C99A45] mb-2">2020</div>
+                                <p class="text-[#F7F6F4]/80 text-sm leading-snug">SPHRi Certification</p>
+                            </div>
+                            <div
+                                class="hidden md:block absolute -bottom-8 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#C99A45] border-4 border-[#0B2545]">
+                            </div>
+                        </div>
+
+                        <div class="relative group">
+                            <div
+                                class="bg-[#F7F6F4]/5 backdrop-blur-sm p-6 rounded-xl border border-[#C99A45]/20 hover:border-[#C99A45]/50 transition-all duration-300 hover:-translate-y-2 text-center">
+                                <div
+                                    class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#C99A45]/20 text-[#C99A45] mb-4">
+                                    ⭐
+                                </div>
+                                <div class="text-2xl font-display font-bold text-[#C99A45] mb-2">2022</div>
+                                <p class="text-[#F7F6F4]/80 text-sm leading-snug">Youth Scholarship Program Launch</p>
+                            </div>
+                            <div
+                                class="hidden md:block absolute -bottom-8 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#C99A45] border-4 border-[#0B2545]">
+                            </div>
+                        </div>
+
+                        <div class="relative group">
+                            <div
+                                class="bg-[#F7F6F4]/5 backdrop-blur-sm p-6 rounded-xl border border-[#C99A45]/20 hover:border-[#C99A45]/50 transition-all duration-300 hover:-translate-y-2 text-center">
+                                <div
+                                    class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#C99A45]/20 text-[#C99A45] mb-4">
+                                    👥
+                                </div>
+                                <div class="text-2xl font-display font-bold text-[#C99A45] mb-2">2023</div>
+                                <p class="text-[#F7F6F4]/80 text-sm leading-snug">1000+ Professionals Mentored</p>
+                            </div>
+                            <div
+                                class="hidden md:block absolute -bottom-8 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#C99A45] border-4 border-[#0B2545]">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Awards highlight -->
+                    <div class="mt-16 text-center">
+                        <div
+                            class="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[#C99A45]/10 border border-[#C99A45]/30">
+                            🏆
+                            <span class="text-[#F7F6F4] font-medium">
+                                Recognized among 100 Most Influential Global HR Leaders
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Scholarship -->
+        <section id="scholarship" class="py-20 bg-[#F7F6F4] font-body">
+            <div class="container-narrow mx-auto px-6 md:px-10">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+
+                    <!-- Content -->
+                    <div>
+                        <div
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#C99A45]/10 text-[#C99A45] mb-6 text-sm font-medium">
+                            ❤️ Youth Empowerment
+                        </div>
+
+                        <h2 class="text-3xl md:text-4xl font-display font-bold text-[#0B2545] mb-6">
+                            Scholarship & Youth Empowerment
+                        </h2>
+
+                        <p class="text-[#637083] leading-relaxed mb-6">
+                            Emmanuel invests in young leaders through full scholarships, coaching,
+                            and mentorship. If you're committed and need support to study, nominate
+                            or apply below.
+                        </p>
+
+                        <!-- Highlights -->
+                        <div class="space-y-4 mb-8">
+                            <div class="flex items-start gap-3">
+                                <div
+                                    class="w-6 h-6 rounded-full bg-[#C99A45]/20 flex items-center justify-center flex-shrink-0 mt-0.5 text-[#C99A45] text-sm">
+                                    ✓</div>
+                                <p class="text-[#637083]">Full scholarships for committed students pursuing higher
+                                    education</p>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div
+                                    class="w-6 h-6 rounded-full bg-[#C99A45]/20 flex items-center justify-center flex-shrink-0 mt-0.5 text-[#C99A45] text-sm">
+                                    ✓</div>
+                                <p class="text-[#637083]">Ongoing mentorship and career guidance from industry leaders
+                                </p>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div
+                                    class="w-6 h-6 rounded-full bg-[#C99A45]/20 flex items-center justify-center flex-shrink-0 mt-0.5 text-[#C99A45] text-sm">
+                                    ✓</div>
+                                <p class="text-[#637083]">Open to candidates demonstrating leadership potential and
+                                    financial need</p>
+                            </div>
+                        </div>
+
+                        <!-- CTA Button -->
+                        <a href="#contact"
+                            class="inline-flex items-center gap-2 px-6 py-4 rounded-xl bg-[#C99A45] text-[#0B2545] font-semibold text-lg hover:bg-[#b7883c] transition">
+                            Nominate or Apply
+                            <span class="transform transition-transform group-hover:translate-x-1">→</span>
+                        </a>
+                    </div>
+
+                    <!-- Visual / Stats Panel -->
+                    <div class="relative">
+                        <div
+                            class="bg-gradient-to-br from-[#0B2545]/10 to-[#C99A45]/10 rounded-2xl p-8 md:p-12 text-center">
+                            <!-- Icon -->
+                            <div
+                                class="w-24 h-24 mx-auto bg-[#C99A45]/20 rounded-full flex items-center justify-center mb-6">
+                                🎓
+                            </div>
+
+                            <h3 class="text-2xl font-display font-semibold text-[#0B2545] mb-2">20+ Scholarships</h3>
+                            <p class="text-[#637083]">Awarded to date</p>
+
+                            <!-- Stats -->
+                            <div class="grid grid-cols-2 gap-4 mt-8">
+                                <div class="bg-white rounded-xl p-4 text-center shadow">
+                                    <div class="text-2xl font-display font-bold text-[#C99A45]">100%</div>
+                                    <div class="text-sm text-[#637083]">Graduation Rate</div>
+                                </div>
+                                <div class="bg-white rounded-xl p-4 text-center shadow">
+                                    <div class="text-2xl font-display font-bold text-[#C99A45]">5+</div>
+                                    <div class="text-sm text-[#637083]">Countries Represented</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Services -->
+        <section id="services" class="py-20 bg-[#F7F6F4] font-body">
+            <div class="container-narrow mx-auto px-6 md:px-10">
+                <!-- Section Header -->
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-[#0B2545] mb-4">
+                        Speaking & Coaching
+                    </h2>
+                    <p class="text-[#637083] max-w-2xl mx-auto">
+                        Transformative programs designed to unlock leadership potential and drive organizational
+                        excellence.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Coaching Services -->
+                    <div
+                        class="bg-white rounded-2xl p-8 border border-[#C99A45]/20 hover:shadow-lg transition-shadow duration-300">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-[#C99A45]/20 flex items-center justify-center">
+                                💼
+                            </div>
+                            <h3 class="text-2xl font-display font-semibold text-[#0B2545]">Coaching Services</h3>
+                        </div>
+
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-3 text-[#637083]">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#C99A45]"></div>Executive Leadership
+                                Development
+                            </li>
+                            <li class="flex items-center gap-3 text-[#637083]">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#C99A45]"></div>Career Transition Coaching
+                            </li>
+                            <li class="flex items-center gap-3 text-[#637083]">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#C99A45]"></div>High-Potential Talent Programs
+                            </li>
+                            <li class="flex items-center gap-3 text-[#637083]">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#C99A45]"></div>Personal Branding for Leaders
+                            </li>
+                            <li class="flex items-center gap-3 text-[#637083]">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#C99A45]"></div>Strategic HR Advisory
+                            </li>
+                        </ul>
+
+                        <p class="text-sm text-[#637083] mb-6">
+                            One-on-one and group programs tailored to your leadership journey.
+                        </p>
+
+                        <a href="#contact"
+                            class="inline-flex items-center justify-center w-full px-6 py-4 rounded-xl bg-[#C99A45] text-[#0B2545] font-semibold text-lg hover:bg-[#b7883c] transition">
+                            Book a Coaching Session →
+                        </a>
+                    </div>
+
+                    <!-- Speaking Engagements -->
+                    <div class="bg-[#0B2545] rounded-2xl p-8 text-[#F7F6F4]">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-[#C99A45]/20 flex items-center justify-center">
+                                🎤
+                            </div>
+                            <h3 class="text-2xl font-display font-semibold">Speaking Engagements</h3>
+                        </div>
+
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-3 text-[#F7F6F4]/80">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#C99A45]"></div>The Future of HR Leadership
+                            </li>
+                            <li class="flex items-center gap-3 text-[#F7F6F4]/80">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#C99A45]"></div>Building High-Performance Teams
+                            </li>
+                            <li class="flex items-center gap-3 text-[#F7F6F4]/80">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#C99A45]"></div>Mentorship & Succession
+                                Planning
+                            </li>
+                            <li class="flex items-center gap-3 text-[#F7F6F4]/80">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#C99A45]"></div>Youth Empowerment in the
+                                Workplace
+                            </li>
+                            <li class="flex items-center gap-3 text-[#F7F6F4]/80">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#C99A45]"></div>Leading Through Transformation
+                            </li>
+                        </ul>
+
+                        <p class="text-sm text-[#F7F6F4]/70 mb-6">
+                            Keynotes, workshops, and panel discussions for conferences and corporate events.
+                        </p>
+
+                        <a href="#contact"
+                            class="inline-flex items-center justify-center w-full px-6 py-4 rounded-xl border border-[#F7F6F4]/30 text-[#F7F6F4] font-semibold text-lg hover:bg-[#F7F6F4]/10 transition">
+                            Invite Emmanuel to Speak →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 bg-gradient-to-br from-[#0B2545] via-[#0B2545] to-[#637083] font-body">
+            <div class="container-narrow mx-auto px-6 md:px-10">
+
+                <!-- Section Header -->
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-[#F7F6F4] mb-4">
+                        Leadership Insights
+                    </h2>
+                    <p class="text-[#F7F6F4]/70">Wisdom from two decades of leadership experience</p>
+                </div>
+
+                <!-- Quote Carousel -->
+                <div class="relative max-w-4xl mx-auto">
+                    <div
+                        class="bg-[#F7F6F4]/5 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-[#F7F6F4]/10 text-center">
+                        <!-- Quote Icon -->
+                        <div class="text-[#C99A45]/50 mb-6 text-4xl">❝</div>
+
+                        <!-- Quote Text -->
+                        <blockquote class="text-xl md:text-2xl lg:text-3xl font-display text-[#F7F6F4] leading-relaxed">
+                            "Leadership is not about being in charge. It's about taking care of those in your charge."
+                        </blockquote>
+
+                        <!-- Author -->
+                        <div class="mt-8 text-[#C99A45] font-medium">— Emmanuel Michael</div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="flex items-center justify-center gap-4 mt-8">
+                        <!-- Previous -->
+                        <button
+                            class="w-10 h-10 rounded-full bg-[#F7F6F4]/10 hover:bg-[#F7F6F4]/20 flex items-center justify-center text-[#F7F6F4] transition-colors">
+                            ←
+                        </button>
+
+                        <!-- Dots -->
+                        <div class="flex gap-2">
+                            <button class="w-6 h-2 rounded-full bg-[#C99A45]"></button>
+                            <button class="w-2 h-2 rounded-full bg-[#F7F6F4]/30 hover:bg-[#F7F6F4]/50"></button>
+                            <button class="w-2 h-2 rounded-full bg-[#F7F6F4]/30 hover:bg-[#F7F6F4]/50"></button>
+                        </div>
+
+                        <!-- Next -->
+                        <button
+                            class="w-10 h-10 rounded-full bg-[#F7F6F4]/10 hover:bg-[#F7F6F4]/20 flex items-center justify-center text-[#F7F6F4] transition-colors">
+                            →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 bg-[#F7F6F4] font-body">
+            <div class="container-narrow mx-auto px-6 md:px-10">
+
+                <!-- Section Header -->
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-[#0B2545] mb-4">
+                        Mentorship Impact
+                    </h2>
+                    <p class="text-[#637083] max-w-2xl mx-auto">
+                        Stories of transformation from leaders who've worked with Emmanuel.
+                    </p>
+                </div>
+
+                <!-- Testimonials Grid -->
+                <div class="grid md:grid-cols-3 gap-6 mb-16">
+
+                    <!-- Testimonial Card -->
+                    <div
+                        class="bg-[#F7F6F4] rounded-2xl p-6 border border-[#637083]/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <!-- Stars -->
+                        <div class="flex gap-1 mb-4 text-[#C99A45]">
+                            ★ ★ ★ ★ ★
+                        </div>
+
+                        <!-- Quote -->
+                        <blockquote class="text-[#637083] leading-relaxed mb-6">
+                            "Emmanuel's mentorship transformed my career trajectory. His strategic insights and genuine
+                            care for my development helped me step into a leadership role I never thought possible."
+                        </blockquote>
+
+                        <!-- Author -->
+                        <div class="border-t border-[#637083]/30 pt-4">
+                            <p class="font-semibold text-[#0B2545]">Sarah O.</p>
+                            <p class="text-sm text-[#637083]">HR Director, Tech Company</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-[#F7F6F4] rounded-2xl p-6 border border-[#637083]/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex gap-1 mb-4 text-[#C99A45]">★ ★ ★ ★ ★</div>
+                        <blockquote class="text-[#637083] leading-relaxed mb-6">
+                            "Working with Emmanuel was a turning point. His coaching style combines deep expertise with
+                            empathy, making complex leadership challenges feel approachable and solvable."
+                        </blockquote>
+                        <div class="border-t border-[#637083]/30 pt-4">
+                            <p class="font-semibold text-[#0B2545]">Michael A.</p>
+                            <p class="text-sm text-[#637083]">CEO, Startup Founder</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-[#F7F6F4] rounded-2xl p-6 border border-[#637083]/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <div class="flex gap-1 mb-4 text-[#C99A45]">★ ★ ★ ★ ★</div>
+                        <blockquote class="text-[#637083] leading-relaxed mb-6">
+                            "The scholarship from Emmanuel didn't just fund my education—it opened doors to a network of
+                            leaders who continue to support my journey. Forever grateful."
+                        </blockquote>
+                        <div class="border-t border-[#637083]/30 pt-4">
+                            <p class="font-semibold text-[#0B2545]">Grace N.</p>
+                            <p class="text-sm text-[#637083]">Scholar, Management Consultant</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Stats Row -->
+                <div class="bg-[#0B2545] rounded-2xl p-8 md:p-12">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center text-[#F7F6F4]">
+
+                        <div>
+                            <div
+                                class="w-16 h-16 mx-auto bg-[#C99A45]/20 rounded-full flex items-center justify-center mb-4 text-[#C99A45]">
+                                👥
+                            </div>
+                            <div class="text-4xl md:text-5xl font-display font-bold mb-2">1000+</div>
+                            <p class="text-[#F7F6F4]/70">Professionals Mentored</p>
+                        </div>
+
+                        <div>
+                            <div
+                                class="w-16 h-16 mx-auto bg-[#C99A45]/20 rounded-full flex items-center justify-center mb-4 text-[#C99A45]">
+                                🎤
+                            </div>
+                            <div class="text-4xl md:text-5xl font-display font-bold mb-2">100+</div>
+                            <p class="text-[#F7F6F4]/70">Speaking Engagements</p>
+                        </div>
+
+                        <div>
+                            <div
+                                class="w-16 h-16 mx-auto bg-[#C99A45]/20 rounded-full flex items-center justify-center mb-4 text-[#C99A45]">
+                                🎓
+                            </div>
+                            <div class="text-4xl md:text-5xl font-display font-bold mb-2">20+</div>
+                            <p class="text-[#F7F6F4]/70">Scholarships Awarded</p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="py-20 bg-[#F7F6F4] font-body">
+            <div class="container-narrow mx-auto px-6 md:px-10">
+                <div class="grid md:grid-cols-2 gap-12">
+
+                    <!-- Contact Form -->
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-display font-bold text-[#0B2545] mb-4">
+                            Let's Connect
+                        </h2>
+                        <p class="text-[#637083] mb-8">
+                            Ready to take the next step in your leadership journey? Reach out to discuss
+                            coaching, speaking engagements, or scholarship opportunities.
+                        </p>
+
+                        <form class="space-y-6">
+
+                            <!-- Name & Email -->
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-[#0B2545] mb-2">Name
+                                        *</label>
+                                    <input type="text" id="name" required placeholder="Your full name"
+                                        class="w-full px-4 py-2 rounded-lg border border-[#C7C7C7] bg-white focus:outline-none focus:ring-2 focus:ring-[#C99A45]" />
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-[#0B2545] mb-2">Email
+                                        *</label>
+                                    <input type="email" id="email" required placeholder="your@email.com"
+                                        class="w-full px-4 py-2 rounded-lg border border-[#C7C7C7] bg-white focus:outline-none focus:ring-2 focus:ring-[#C99A45]" />
+                                </div>
+                            </div>
+
+                            <!-- Organization & Request Type -->
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="organization"
+                                        class="block text-sm font-medium text-[#0B2545] mb-2">Organization</label>
+                                    <input type="text" id="organization" placeholder="Company or institution"
+                                        class="w-full px-4 py-2 rounded-lg border border-[#C7C7C7] bg-white focus:outline-none focus:ring-2 focus:ring-[#C99A45]" />
+                                </div>
+                                <div>
+                                    <label for="requestType"
+                                        class="block text-sm font-medium text-[#0B2545] mb-2">Request Type *</label>
+                                    <select id="requestType"
+                                        class="w-full px-4 py-2 rounded-lg border border-[#C7C7C7] bg-white focus:outline-none focus:ring-2 focus:ring-[#C99A45]">
+                                        <option value="">Select an option</option>
+                                        <option value="coaching">Coaching</option>
+                                        <option value="speaking">Speaking Engagement</option>
+                                        <option value="scholarship">Scholarship</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Message -->
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-[#0B2545] mb-2">Message
+                                    *</label>
+                                <textarea id="message" rows="5" required placeholder="Tell us about your needs..."
+                                    class="w-full px-4 py-2 rounded-lg border border-[#C7C7C7] bg-white resize-none focus:outline-none focus:ring-2 focus:ring-[#C99A45]"></textarea>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit"
+                                class="w-full bg-[#C99A45] text-white font-medium py-3 rounded-lg hover:bg-[#b58a3b] transition-colors flex items-center justify-center gap-2">
+                                Send Message
+                                <span>✉️</span>
+                            </button>
+
+                            <p class="text-sm text-[#637083] text-center">
+                                We'll get back within 3 working days. For urgent requests, use the contacts below.
+                            </p>
+                        </form>
+                    </div>
+
+                    <!-- Alternative Contact Info -->
+                    <div class="flex flex-col justify-center">
+                        <div class="bg-[#0B2545] rounded-2xl p-8 text-[#F7F6F4]">
+
+                            <h3 class="text-2xl font-display font-semibold mb-6">Alternative Contact</h3>
+
+                            <div class="space-y-6">
+                                <a href="mailto:enmichael@enmichael.ng"
+                                    class="flex items-center gap-4 p-4 rounded-xl bg-[#F7F6F4]/5 hover:bg-[#F7F6F4]/10 transition-colors">
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-[#C99A45]/20 flex items-center justify-center text-[#C99A45]">
+                                        ✉️</div>
+                                    <div>
+                                        <p class="text-sm text-[#F7F6F4]/60">Email</p>
+                                        <p class="font-medium hover:text-[#C99A45] transition-colors">
+                                            enmichael@enmichael.ng</p>
+                                    </div>
+                                </a>
+
+                                <a href="https://wa.me/message/yourwhatsapplink" target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="flex items-center gap-4 p-4 rounded-xl bg-[#F7F6F4]/5 hover:bg-[#F7F6F4]/10 transition-colors">
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-[#C99A45]/20 flex items-center justify-center text-[#C99A45]">
+                                        💬</div>
+                                    <div>
+                                        <p class="text-sm text-[#F7F6F4]/60">WhatsApp</p>
+                                        <p class="font-medium hover:text-[#C99A45] transition-colors">Send a message</p>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div
+                                class="mt-8 p-4 rounded-xl bg-[#C99A45]/10 border border-[#C99A45]/30 text-center text-sm text-[#F7F6F4]/80">
+                                🌍 Available for engagements worldwide
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <footer class="bg-[#0B2545] text-[#F7F6F4] py-12 font-body">
+        <div class="container-narrow mx-auto px-6 md:px-10">
+
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+
+                <!-- Brand -->
+                <div>
+                    <a href="#" class="inline-block mb-4 text-2xl font-display font-bold">
+                        HR<span class="text-[#C99A45]">with</span>EM
+                    </a>
+                    <p class="text-[#F7F6F4]/60 text-sm leading-relaxed">
+                        Empowering the next generation of leaders through coaching, mentorship, and scholarship.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <nav class="flex flex-col gap-2">
+                        <a href="#about"
+                            class="text-[#F7F6F4]/60 hover:text-[#C99A45] transition-colors text-sm">About</a>
+                        <a href="#achievements"
+                            class="text-[#F7F6F4]/60 hover:text-[#C99A45] transition-colors text-sm">Achievements</a>
+                        <a href="#scholarship"
+                            class="text-[#F7F6F4]/60 hover:text-[#C99A45] transition-colors text-sm">Scholarship</a>
+                        <a href="#services"
+                            class="text-[#F7F6F4]/60 hover:text-[#C99A45] transition-colors text-sm">Services</a>
+                        <a href="#contact"
+                            class="text-[#F7F6F4]/60 hover:text-[#C99A45] transition-colors text-sm">Contact</a>
+                    </nav>
+                </div>
+
+                <!-- Social Links -->
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <div class="flex gap-3">
+                        <a href="https://linkedin.com/in/enmichael" target="_blank" rel="noopener noreferrer"
+                            class="w-10 h-10 rounded-full bg-[#F7F6F4]/10 hover:bg-[#C99A45] hover:text-[#0B2545] flex items-center justify-center transition-all"
+                            aria-label="LinkedIn">in</a>
+                        <a href="https://twitter.com/enmichael" target="_blank" rel="noopener noreferrer"
+                            class="w-10 h-10 rounded-full bg-[#F7F6F4]/10 hover:bg-[#C99A45] hover:text-[#0B2545] flex items-center justify-center transition-all"
+                            aria-label="Twitter">🐦</a>
+                        <a href="mailto:enmichael@enmichael.ng"
+                            class="w-10 h-10 rounded-full bg-[#F7F6F4]/10 hover:bg-[#C99A45] hover:text-[#0B2545] flex items-center justify-center transition-all"
+                            aria-label="Email">✉️</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Row -->
+            <div
+                class="border-t border-[#F7F6F4]/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#F7F6F4]/50">
+                <p>© 2025 Emmanuel Michael. All rights reserved.</p>
+                <p>Leadership • Mentorship • Impact</p>
+            </div>
+
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            const header = document.getElementById('site-header');
+            const toggleBtn = document.getElementById('mobile-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const iconMenu = document.getElementById('icon-menu');
+            const iconX = document.getElementById('icon-x');
+            const navLinks = document.querySelectorAll('[data-nav]');
+            const inviteBtn = document.getElementById('invite-btn');
+            const bookBtn = document.getElementById('book-btn');
+            const inviteMob = document.getElementById('invite-mob');
+            const bookMob = document.getElementById('book-mob');
+
+            // Scroll handler to toggle 'scrolled' class (>50px)
+            const handleScroll = () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            };
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            handleScroll();
+
+            // Mobile menu toggle
+            const setMenuOpen = (open) => {
+                if (open) {
+                    mobileMenu.classList.remove('hidden');
+                    iconMenu.classList.add('hidden');
+                    iconX.classList.remove('hidden');
+                    toggleBtn.setAttribute('aria-expanded', 'true');
+                } else {
+                    mobileMenu.classList.add('hidden');
+                    iconMenu.classList.remove('hidden');
+                    iconX.classList.add('hidden');
+                    toggleBtn.setAttribute('aria-expanded', 'false');
+                }
+            };
+
+            toggleBtn.addEventListener('click', () => {
+                const currentlyOpen = toggleBtn.getAttribute('aria-expanded') === 'true';
+                setMenuOpen(!currentlyOpen);
+            });
+
+            // Smooth scroll helper
+            const smoothScrollTo = (id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            // Close mobile menu when nav link clicked
+            navLinks.forEach(a => {
+                a.addEventListener('click', (e) => {
+                    const href = a.getAttribute('href') || '';
+                    if (href.startsWith('#')) {
+                        const id = href.slice(1);
+                        smoothScrollTo(id);
+                        setMenuOpen(false);
+                    }
+                });
+            });
+
+            // Desktop CTA behavior
+            inviteBtn?.addEventListener('click', () => smoothScrollTo('contact'));
+            bookBtn?.addEventListener('click', () => smoothScrollTo('contact'));
+
+            // Mobile CTA buttons also scroll + close menu
+            inviteMob?.addEventListener('click', () => { smoothScrollTo('contact'); setMenuOpen(false); });
+            bookMob?.addEventListener('click', () => { smoothScrollTo('contact'); setMenuOpen(false); });
+
+            // close mobile menu if resizing to desktop
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768) {
+                    setMenuOpen(false);
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>
